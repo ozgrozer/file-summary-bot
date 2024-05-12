@@ -38,7 +38,7 @@ const main = async () => {
       ]
 
       const messageWithFileContent = fileContent
-        ? `${msg.text} ${fileContent}`
+        ? `${msg.caption} ${fileContent}`
         : msg.text
       messages.push({ role: 'user', content: messageWithFileContent })
 
