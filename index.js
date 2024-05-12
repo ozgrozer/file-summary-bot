@@ -11,6 +11,8 @@ const main = async () => {
   try {
     console.log('Listening messages')
 
+    const chats = {}
+
     bot.on('message', async msg => {
       const chatId = msg.chat.id
 
@@ -33,16 +35,17 @@ const main = async () => {
         return
       }
 
-      const messages = [
-        { role: 'system', content: 'You are a bot designed to summarize given file content.' }
-      ]
+      if (!chats[chatId]) {
+        chats[chatId] = []
+        chats[chatId].push({ role: 'system', content: 'You are a bot designed to summarize given file content.' })
+      }
 
       const messageWithFileContent = fileContent
         ? `${msg.caption} ${fileContent}`
         : msg.text
-      messages.push({ role: 'user', content: messageWithFileContent })
+      chats[chatId].push({ role: 'user', content: messageWithFileContent })
 
-      const chatCompletion = await groq.chat.completions.create({ model, messages })
+      const chatCompletion = await groq.chat.completions.create({ model, messages: chats[chatId] })
       const lastMessage = chatCompletion.choices[0]?.message?.content || ''
 
       bot.sendMessage(chatId, lastMessage)
